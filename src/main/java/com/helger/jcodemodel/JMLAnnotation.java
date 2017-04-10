@@ -49,11 +49,8 @@ import javax.annotation.Nullable;
 import com.helger.jcodemodel.util.JCValueEnforcer;
 
 /**
- * JML annotation block.
- * <p>
- * A JML annotation consists of multiple parts. There's the main part (that
- * comes the first in in the comment section), then the parameter parts
- * (@param), the return part (@return), and the throws parts (@throws).
+ * JML annotation block. A JML annotation consists of lines, each of which
+ * begins with a keyword indicating the type of annotation. Supports non-JML annotation keywords.
  */
 public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
 {
@@ -61,28 +58,8 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
 
   private final JCodeModel m_aOwner;
 
-  /**
-   * list of @param tags
-   */
-  private final Map <String, JCommentPart> m_aAtParams = new LinkedHashMap <> ();
-
-  /**
-   * The @return tag part.
-   */
-  private JCommentPart m_aAtReturn;
-
-  /**
-   * list of @throws tags
-   */
-  private final Map <AbstractJClass, JCommentPart> m_aAtThrows = new LinkedHashMap <> ();
-
-  /**
-   * Other comment tags (like @author, @deprecated, @since, @version etc.)
-   */
-  private final Map <String, JCommentPart> m_aAtTags = new LinkedHashMap <> ();
-
-  /** list of generic xdoclets */
-  private final Map <String, Map <String, String>> m_aAtXdoclets = new LinkedHashMap <> ();
+  /** list of generic non-JML specification keywords */
+  private final Map <String, Map <String, String>> m_Keywords = new LinkedHashMap <> ();
 
   protected JMLAnnotation (@Nonnull final JCodeModel owner)
   {
@@ -103,264 +80,121 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
   }
 
   /**
-   * Append a text to a @param tag to the javadoc
-   *
-   * @param param
-   *        Parameter to be added
-   * @return The created {@link JCommentPart}
-   */
-  @Nonnull
-  public JCommentPart addParam (@Nonnull final String param)
-  {
-    JCommentPart p = m_aAtParams.get (param);
-    if (p == null)
-    {
-      p = new JCommentPart ();
-      m_aAtParams.put (param, p);
-    }
-    return p;
-  }
-
-  /**
-   * Append a text to an @param tag.
-   *
-   * @param param
-   *        Parameter to be added
-   * @return The created {@link JCommentPart}
-   */
-  public JCommentPart addParam (@Nonnull final JVar param)
-  {
-    return addParam (param.name ());
-  }
-
-  @Nullable
-  public JCommentPart removeParam (@Nullable final String param)
-  {
-    return m_aAtParams.remove (param);
-  }
-
-  @Nullable
-  public JCommentPart removeParam (@Nonnull final JVar param)
-  {
-    return removeParam (param.name ());
-  }
-
-  public void removeAllParams ()
-  {
-    m_aAtParams.clear ();
-  }
-
-  @Nullable
-  public JCommentPart getParam (@Nullable final String param)
-  {
-    return m_aAtParams.get (param);
-  }
-
-  @Nullable
-  public JCommentPart getParam (@Nonnull final JVar param)
-  {
-    return getParam (param.name ());
-  }
-
-
-  /**
-   * add a @throws tag to the javadoc
-   *
-   * @param exception
-   *        Exception to be added. May not be <code>null</code>.
-   * @return New {@link JCommentPart}
-   */
-  public JCommentPart addThrows (@Nonnull final Class <? extends Throwable> exception)
-  {
-    return addThrows (m_aOwner.ref (exception));
-  }
-
-  /**
-   * add a @throws tag to the javadoc
-   *
-   * @param exception
-   *        Exception to be added. May not be <code>null</code>.
-   * @return New {@link JCommentPart}
-   */
-  public JCommentPart addThrows (@Nonnull final AbstractJClass exception)
-  {
-    JCommentPart p = m_aAtThrows.get (exception);
-    if (p == null)
-    {
-      p = new JCommentPart ();
-      m_aAtThrows.put (exception, p);
-    }
-    return p;
-  }
-
-  @Nullable
-  public JCommentPart removeThrows (@Nonnull final Class <? extends Throwable> exception)
-  {
-    return removeThrows (m_aOwner.ref (exception));
-  }
-
-  @Nullable
-  public JCommentPart removeThrows (@Nullable final AbstractJClass exception)
-  {
-    return m_aAtThrows.remove (exception);
-  }
-
-  public void removeAllThrows ()
-  {
-    m_aAtThrows.clear ();
-  }
-
-  @Nullable
-  public JCommentPart getThrows (@Nonnull final Class <? extends Throwable> exception)
-  {
-    return getThrows (m_aOwner.ref (exception));
-  }
-
-  @Nullable
-  public JCommentPart getThrows (@Nullable final AbstractJClass exception)
-  {
-    return m_aAtThrows.get (exception);
-  }
-
-  @Nonnull
-  public JCommentPart addTag (@Nonnull final String sName)
-  {
-    JCValueEnforcer.notEmpty (sName, "Name");
-    JCommentPart aPart = m_aAtTags.get (sName);
-    if (aPart == null)
-    {
-      aPart = new JCommentPart ();
-      m_aAtTags.put (sName, aPart);
-    }
-    return aPart;
-  }
-
-  @Nullable
-  public JCommentPart removeTag (@Nullable final String sName)
-  {
-    return m_aAtTags.remove (sName);
-  }
-
-  @Nullable
-  public JCommentPart getTag (@Nullable final String sName)
-  {
-    return m_aAtTags.get (sName);
-  }
-
-  /**
-   * add an xdoclet.
+   * Add a new non-JML specification keyword. This is a way of adding keywords
+   * not currently supported by the JMLAnnotation object. If the keyword already
+   * exists, it's uses will be returned.
    *
    * @param name
-   *        xdoclet name
+   *        keyword's syntactic token
    * @return Map with the key/value pairs
    */
   @Nonnull
-  public Map <String, String> addXdoclet (@Nonnull final String name)
+  public Map <String, String> addKeyword (@Nonnull final String name)
   {
-    Map <String, String> p = m_aAtXdoclets.get (name);
+    Map <String, String> p = m_Keywords.get (name);
     if (p == null)
     {
       p = new LinkedHashMap <> ();
-      m_aAtXdoclets.put (name, p);
+      m_Keywords.put (name, p);
     }
     return p;
   }
 
   /**
-   * add an xdoclet.
+   * Add a specification keyword.
    *
    * @param name
-   *        xdoclet name
+   *        keyword's syntactic token
    * @param attributes
-   *        Attributes to be added
-   * @return Map with the key/value pairs
+   *        Initial uses of the keyword.
+   * @return Returns all uses of the specification keyword, including those
+   *         specified just now.
    */
   @Nonnull
-  public Map <String, String> addXdoclet (@Nonnull final String name, @Nonnull final Map <String, String> attributes)
+  public Map <String, String> addKeyword (@Nonnull final String name, @Nonnull final Map <String, String> attributes)
   {
-    final Map <String, String> p = addXdoclet (name);
+    final Map <String, String> p = addKeyword (name);
     p.putAll (attributes);
     return p;
   }
 
   /**
-   * add an xdoclet with <code>@name attribute = "value"</code>. If value is
-   * <code>null</code> than it will be <code>@name attribute</code>.
+   * Add a specification keyword with the form
+   * <code>@name attribute = "value"</code>. If value is <code>null</code> then
+   * the specification will be <code>@name attribute</code>.
    *
    * @param name
-   *        xdoclet name
+   *        keyword's syntactic token
    * @param attribute
-   *        Attribute name to be added
+   *        Attribute expression to be added
    * @param value
    *        Attribute value to be added
    * @return Map with the key/value pairs
    */
   @Nonnull
-  public Map <String, String> addXdoclet (@Nonnull final String name,
+  public Map <String, String> addKeyword (@Nonnull final String name,
                                           @Nonnull final String attribute,
                                           @Nullable final String value)
   {
-    final Map <String, String> p = addXdoclet (name);
+    final Map <String, String> p = addKeyword (name);
     p.put (attribute, value);
     return p;
   }
 
   @Nullable
-  public Map <String, String> removeXdoclet (@Nullable final String name)
+  public Map <String, String> removeKeyword (@Nullable final String name)
   {
-    return m_aAtXdoclets.remove (name);
+    return m_Keywords.remove (name);
   }
 
-  public void removeAllXdoclets ()
+  public void removeAllKeywords ()
   {
-    m_aAtXdoclets.clear ();
+    m_Keywords.clear ();
   }
 
   public void generate (@Nonnull final JFormatter f)
   {
-    // Is any "@" comment present?
-    final boolean bHasAt = !m_aAtParams.isEmpty () ||
-                           m_aAtReturn != null ||
-                           !m_aAtThrows.isEmpty () ||
-                           !m_aAtTags.isEmpty () ||
-                           !m_aAtXdoclets.isEmpty ();
-    if (!isEmpty () || bHasAt)
+    // Is any keyword used? TODO: add support for explicit annotation keywords
+    final boolean bHasAnnotation = // !m_aAtParams.isEmpty () ||
+    // m_aAtReturn != null ||
+    // !m_aAtThrows.isEmpty () ||
+    // !m_aAtTags.isEmpty () ||
+                                 !m_Keywords.isEmpty ();
+
+    // TODO: figure out how the heck this.isEmpty() might return false...
+    if (!isEmpty () || bHasAnnotation)
     {
-      final boolean bIsJavaDoc = true;
       final String sIndent = " @ ";
-      final String sIndentLarge = sIndent + "    ";
+      final String sIndentLarge = sIndent + "\t";
 
       // Start comment
-      f.print (bIsJavaDoc ? "/**" : "/*").newline ();
+      f.print ("/*").newline ();
 
       // Print all simple text elements
       format (f, sIndent);
-      if (!isEmpty () && bHasAt)
+      if (!isEmpty () && bHasAnnotation)
         f.print (sIndent).newline ();
 
-      for (final Map.Entry <String, JCommentPart> aEntry : m_aAtParams.entrySet ())
+      /*
+       * for (final Map.Entry <String, JCommentPart> aEntry :
+       * m_aAtParams.entrySet ()) { f.print (sIndent + "@param ").print
+       * (aEntry.getKey ()).newline (); aEntry.getValue ().format (f,
+       * sIndentLarge); } if (m_aAtReturn != null) { f.print (sIndent +
+       * "@return").newline (); m_aAtReturn.format (f, sIndentLarge); } for
+       * (final Map.Entry <AbstractJClass, JCommentPart> aEntry :
+       * m_aAtThrows.entrySet ()) { f.print (sIndent + "@throws ").type
+       * (aEntry.getKey ()).newline (); aEntry.getValue ().format (f,
+       * sIndentLarge); } for (final Map.Entry <String, JCommentPart> aEntry :
+       * m_aAtTags.entrySet ()) { f.print (sIndent + "@" + aEntry.getKey () +
+       * " "); aEntry.getValue ().format (f, ""); }
+       */
+
+      // Output ensures that nonterminals are not split across separate
+      // annotations.
+      // Each annotation must be a single grammatical unit.
+      for (final Map.Entry <String, Map <String, String>> aEntry : m_Keywords.entrySet ())
       {
-        f.print (sIndent + "@param ").print (aEntry.getKey ()).newline ();
-        aEntry.getValue ().format (f, sIndentLarge);
-      }
-      if (m_aAtReturn != null)
-      {
-        f.print (sIndent + "@return").newline ();
-        m_aAtReturn.format (f, sIndentLarge);
-      }
-      for (final Map.Entry <AbstractJClass, JCommentPart> aEntry : m_aAtThrows.entrySet ())
-      {
-        f.print (sIndent + "@throws ").type (aEntry.getKey ()).newline ();
-        aEntry.getValue ().format (f, sIndentLarge);
-      }
-      for (final Map.Entry <String, JCommentPart> aEntry : m_aAtTags.entrySet ())
-      {
-        f.print (sIndent + "@" + aEntry.getKey () + " ");
-        aEntry.getValue ().format (f, "");
-      }
-      for (final Map.Entry <String, Map <String, String>> aEntry : m_aAtXdoclets.entrySet ())
-      {
-        f.print (sIndent + "@").print (aEntry.getKey ());
+        f.print (sIndent).print (aEntry.getKey ());
         if (aEntry.getValue () != null)
         {
           for (final Map.Entry <String, String> aEntry2 : aEntry.getValue ().entrySet ())
@@ -378,7 +212,7 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
       }
 
       // End comment
-      f.print (" */").newline ();
+      f.print ("@*/").newline ();
     }
   }
 }
