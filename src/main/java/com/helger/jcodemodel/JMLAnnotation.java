@@ -50,7 +50,8 @@ import com.helger.jcodemodel.util.JCValueEnforcer;
 
 /**
  * JML annotation block. A JML annotation consists of lines, each of which
- * begins with a keyword indicating the type of annotation. Supports non-JML annotation keywords.
+ * begins with a keyword indicating the type of annotation. Supports non-JML
+ * annotation keywords.
  */
 public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
 {
@@ -59,6 +60,9 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
   private final JCodeModel m_aOwner;
 
   /** list of generic non-JML specification keywords */
+  // TODO: create a new object called JMLExpression which inherits from the
+  // basic abstract expression type
+  // TODO: replace this with a map from String to JMLExpression
   private final Map <String, Map <String, String>> m_Keywords = new LinkedHashMap <> ();
 
   protected JMLAnnotation (@Nonnull final JCodeModel owner)
@@ -154,7 +158,8 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
 
   public void generate (@Nonnull final JFormatter f)
   {
-    // Is any keyword used? TODO: add support for explicit annotation keywords
+    // Is any keyword used? TODO: add support for explicit annotation keywords,
+    // possibly abstract this into a method
     final boolean bHasAnnotation = // !m_aAtParams.isEmpty () ||
     // m_aAtReturn != null ||
     // !m_aAtThrows.isEmpty () ||
@@ -176,7 +181,8 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
         f.print (sIndent).newline ();
 
       /*
-       * for (final Map.Entry <String, JCommentPart> aEntry :
+       * THIS BLOCK CONTAINS OLD CRUFT FROM JDocComment which might be useful to
+       * peek at for (final Map.Entry <String, JCommentPart> aEntry :
        * m_aAtParams.entrySet ()) { f.print (sIndent + "@param ").print
        * (aEntry.getKey ()).newline (); aEntry.getValue ().format (f,
        * sIndentLarge); } if (m_aAtReturn != null) { f.print (sIndent +
@@ -202,7 +208,9 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
             final String sName = aEntry2.getKey ();
             f.print (" ").print (sName);
 
-            // Print value only if present
+            // Print value only if present, currently only the assignment
+            // operator with maps of strings is supported...
+            // TODO: change this out to use JMLExpression
             final String sValue = aEntry2.getValue ();
             if (sValue != null && sValue.length () > 0)
               f.print ("= \"").print (sValue).print ("\"");
