@@ -40,7 +40,9 @@
  */
 package com.helger.jcodemodel;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -63,7 +65,7 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
   // TODO: create a new object called JMLExpression which inherits from the
   // basic abstract expression type
   // TODO: replace this with a map from String to JMLExpression
-  private final Map <String, Map <String, String>> m_Keywords = new LinkedHashMap <> ();
+  private final Map <String, List <String>> m_Keywords = new HashMap <> ();
 
   protected JMLAnnotation (@Nonnull final JCodeModel owner)
   {
@@ -84,8 +86,8 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
   }
 
   /**
-   * Add a new non-JML specification keyword. This is a way of adding keywords
-   * not currently supported by the JMLAnnotation object. If the keyword already
+   * Add a new specification keyword. This is a way of adding keywords not
+   * explicitly supported by the JMLAnnotation object. If the keyword already
    * exists, it's uses will be returned.
    *
    * @param name
@@ -93,12 +95,12 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    * @return Map with the key/value pairs
    */
   @Nonnull
-  public Map <String, String> addKeyword (@Nonnull final String name)
+  private List <String> addKeyword (@Nonnull final String name)
   {
-    Map <String, String> p = m_Keywords.get (name);
+    List <String> p = m_Keywords.get (name);
     if (p == null)
     {
-      p = new LinkedHashMap <> ();
+      p = new ArrayList <> ();
       m_Keywords.put (name, p);
     }
     return p;
@@ -109,46 +111,24 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    *
    * @param name
    *        keyword's syntactic token
-   * @param attributes
+   * @param specs
    *        Initial uses of the keyword.
    * @return Returns all uses of the specification keyword, including those
    *         specified just now.
    */
   @Nonnull
-  public Map <String, String> addKeyword (@Nonnull final String name, @Nonnull final Map <String, String> attributes)
+  private List <String> addKeyword (@Nonnull final String name, @Nonnull final List <String> specs)
   {
-    final Map <String, String> p = addKeyword (name);
-    p.putAll (attributes);
-    return p;
-  }
-
-  /**
-   * Add a specification keyword with the form
-   * <code>@name attribute = "value"</code>. If value is <code>null</code> then
-   * the specification will be <code>@name attribute</code>.
-   *
-   * @param name
-   *        keyword's syntactic token
-   * @param attribute
-   *        Attribute expression to be added
-   * @param value
-   *        Attribute value to be added
-   * @return Map with the key/value pairs
-   */
-  @Nonnull
-  public Map <String, String> addKeyword (@Nonnull final String name,
-                                          @Nonnull final String attribute,
-                                          @Nullable final String value)
-  {
-    final Map <String, String> p = addKeyword (name);
-    p.put (attribute, value);
+    final List <String> p = addKeyword (name);
+    p.addAll (specs);
     return p;
   }
 
   @Nullable
-  public Map <String, String> removeKeyword (@Nullable final String name)
+  public Map <String, List <String>> removeKeyword (@Nullable final String name)
   {
-    return m_Keywords.remove (name);
+    m_Keywords.remove (name);
+    return m_Keywords;
   }
 
   public void removeAllKeywords ()
@@ -166,11 +146,10 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
     // !m_aAtTags.isEmpty () ||
                                  !m_Keywords.isEmpty ();
 
-    // TODO: figure out how the heck this.isEmpty() might return false...
     if (!isEmpty () || bHasAnnotation)
     {
       final String sIndent = " @ ";
-      final String sIndentLarge = sIndent + "\t";
+      // final String sIndentLarge = sIndent + "\t";
 
       // Start comment
       f.print ("/*").newline ();
@@ -180,43 +159,25 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
       if (!isEmpty () && bHasAnnotation)
         f.print (sIndent).newline ();
 
-      /*
-       * THIS BLOCK CONTAINS OLD CRUFT FROM JDocComment which might be useful to
-       * peek at for (final Map.Entry <String, JCommentPart> aEntry :
-       * m_aAtParams.entrySet ()) { f.print (sIndent + "@param ").print
-       * (aEntry.getKey ()).newline (); aEntry.getValue ().format (f,
-       * sIndentLarge); } if (m_aAtReturn != null) { f.print (sIndent +
-       * "@return").newline (); m_aAtReturn.format (f, sIndentLarge); } for
-       * (final Map.Entry <AbstractJClass, JCommentPart> aEntry :
-       * m_aAtThrows.entrySet ()) { f.print (sIndent + "@throws ").type
-       * (aEntry.getKey ()).newline (); aEntry.getValue ().format (f,
-       * sIndentLarge); } for (final Map.Entry <String, JCommentPart> aEntry :
-       * m_aAtTags.entrySet ()) { f.print (sIndent + "@" + aEntry.getKey () +
-       * " "); aEntry.getValue ().format (f, ""); }
-       */
-
+      // Print programmatically defined keywords with their specification
+      // strings.
       // Output ensures that nonterminals are not split across separate
-      // annotations.
-      // Each annotation must be a single grammatical unit.
-      for (final Map.Entry <String, Map <String, String>> aEntry : m_Keywords.entrySet ())
+      // annotations. Each annotation must be a single grammatical unit.
+      for (final Map.Entry <String, List <String>> aEntry : m_Keywords.entrySet ())
       {
-        f.print (sIndent).print (aEntry.getKey ());
         if (aEntry.getValue () != null)
         {
-          for (final Map.Entry <String, String> aEntry2 : aEntry.getValue ().entrySet ())
+          for (final String specStrings : aEntry.getValue ())
           {
-            final String sName = aEntry2.getKey ();
-            f.print (" ").print (sName);
-
-            // Print value only if present, currently only the assignment
-            // operator with maps of strings is supported...
-            // TODO: change this out to use JMLExpression
-            final String sValue = aEntry2.getValue ();
-            if (sValue != null && sValue.length () > 0)
-              f.print ("= \"").print (sValue).print ("\"");
+            f.print (sIndent).print (aEntry.getKey ());
+            f.print (" ").print (specStrings).newline ();
           }
         }
-        f.newline ();
+        else
+        {
+          f.print (sIndent).print (aEntry.getKey ());
+          f.newline ();
+        }
       }
 
       // End comment
