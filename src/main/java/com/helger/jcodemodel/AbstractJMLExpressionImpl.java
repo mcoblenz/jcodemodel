@@ -9,6 +9,10 @@ import javax.annotation.Nonnull;
  * Provides default implementations for {@link IJMLExpression}. JML operators
  * (e.g. implication, equivalence) only support JExpressions, which means that
  * nesting JML operators is not supported.
+ * <p>
+ * JML expressions do not support real value types (e.g. double, float),
+ * therefore methods for operators with real valued operands are not
+ * implemented.
  */
 public abstract class AbstractJMLExpressionImpl implements IJMLExpression
 {
@@ -69,18 +73,18 @@ public abstract class AbstractJMLExpressionImpl implements IJMLExpression
   }
 
   // Real values are not supported.
-  // @Nonnull
-  // public final JOpBinary plus (final double right)
-  // {
-  // return plus (JExpr.lit (right));
-  // }
+  @Nonnull
+  public final JOpBinary plus (final double right)
+  {
+    throw new UnsupportedOperationException ();
+  }
 
   // Real values are not supported.
-  // @Nonnull
-  // public final JOpBinary plus (final float right)
-  // {
-  // return plus (JExpr.lit (right));
-  // }
+  @Nonnull
+  public final JOpBinary plus (final float right)
+  {
+    throw new UnsupportedOperationException ();
+  }
 
   @Nonnull
   public final JOpBinary plus (final int right)
@@ -107,18 +111,18 @@ public abstract class AbstractJMLExpressionImpl implements IJMLExpression
   }
 
   // Real values are not supported.
-  // @Nonnull
-  // public final JOpBinary minus (final double right)
-  // {
-  // return minus (JExpr.lit (right));
-  // }
+  @Nonnull
+  public final JOpBinary minus (final double right)
+  {
+    throw new UnsupportedOperationException ();
+  }
 
   // Real values are not supported.
-  // @Nonnull
-  // public final JOpBinary minus (final float right)
-  // {
-  // return minus (JExpr.lit (right));
-  // }
+  @Nonnull
+  public final JOpBinary minus (final float right)
+  {
+    throw new UnsupportedOperationException ();
+  }
 
   @Nonnull
   public final JOpBinary minus (final int right)
@@ -139,18 +143,18 @@ public abstract class AbstractJMLExpressionImpl implements IJMLExpression
   }
 
   // Real values are not supported.
-  // @Nonnull
-  // public final JOpBinary mul (final double right)
-  // {
-  // return mul (JExpr.lit (right));
-  // }
+  @Nonnull
+  public final JOpBinary mul (final double right)
+  {
+    throw new UnsupportedOperationException ();
+  }
 
   // Real values are not supported.
-  // @Nonnull
-  // public final JOpBinary mul (final float right)
-  // {
-  // return mul (JExpr.lit (right));
-  // }
+  @Nonnull
+  public final JOpBinary mul (final float right)
+  {
+    throw new UnsupportedOperationException ();
+  }
 
   @Nonnull
   public final JOpBinary mul (final int right)
@@ -170,17 +174,19 @@ public abstract class AbstractJMLExpressionImpl implements IJMLExpression
     return JOp.div (this, right);
   }
 
-  // @Nonnull
-  // public final JOpBinary div (final double right)
-  // {
-  // return div (JExpr.lit (right));
-  // }
+  // Real values are not supported.
+  @Nonnull
+  public final JOpBinary div (final double right)
+  {
+    throw new UnsupportedOperationException ();
+  }
 
-  // @Nonnull
-  // public final JOpBinary div (final float right)
-  // {
-  // return div (JExpr.lit (right));
-  // }
+  // Real values are not supported.
+  @Nonnull
+  public final JOpBinary div (final float right)
+  {
+    throw new UnsupportedOperationException ();
+  }
 
   @Nonnull
   public final JOpBinary div (final int right)
