@@ -62,9 +62,6 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
   private final JCodeModel m_aOwner;
 
   /** list of generic non-JML specification keywords */
-  // TODO: create a new object called JMLExpression which inherits from the
-  // basic abstract expression type
-  // TODO: replace this with a map from String to JMLExpression
   private final Map <String, List <JMLExpr>> m_Keywords = new HashMap <> ();
 
   protected JMLAnnotation (@Nonnull final JCodeModel owner)
