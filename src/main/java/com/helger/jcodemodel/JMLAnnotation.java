@@ -65,7 +65,7 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
   // TODO: create a new object called JMLExpression which inherits from the
   // basic abstract expression type
   // TODO: replace this with a map from String to JMLExpression
-  private final Map <String, List <String>> m_Keywords = new HashMap <> ();
+  private final Map <String, List <JMLExpr>> m_Keywords = new HashMap <> ();
 
   protected JMLAnnotation (@Nonnull final JCodeModel owner)
   {
@@ -95,9 +95,9 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    * @return Map with the key/value pairs
    */
   @Nonnull
-  private List <String> addKeyword (@Nonnull final String name)
+  private List <JMLExpr> addKeyword (@Nonnull final String name)
   {
-    List <String> p = m_Keywords.get (name);
+    List <JMLExpr> p = m_Keywords.get (name);
     if (p == null)
     {
       p = new ArrayList <> ();
@@ -117,29 +117,29 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    *         specified just now.
    */
   @Nonnull
-  private List <String> addKeyword (@Nonnull final String name, @Nonnull final List <String> specs)
+  private List <JMLExpr> addKeyword (@Nonnull final String name, @Nonnull final List <JMLExpr> specs)
   {
-    final List <String> p = addKeyword (name);
+    final List <JMLExpr> p = addKeyword (name);
     p.addAll (specs);
     return p;
   }
 
   @Nullable
-  public Map <String, List <String>> removeKeyword (@Nullable final String name)
+  public Map <String, List <JMLExpr>> removeKeyword (@Nullable final JMLExpr name)
   {
     m_Keywords.remove (name);
     return m_Keywords;
   }
-
-  public void removeAllKeywords ()
-  {
-    m_Keywords.clear ();
+  
+  public void addEnsures(JMLExpr ensuresClause){
+    final List<JMLExpr> p = new ArrayList<>();
+    p.add (ensuresClause);
+    addKeyword("ensures", p);
   }
 
   public void generate (@Nonnull final JFormatter f)
   {
-    // Is any keyword used? TODO: add support for explicit annotation keywords,
-    // possibly abstract this into a method
+    // Is any keyword used?
     final boolean bHasAnnotation = // !m_aAtParams.isEmpty () ||
     // m_aAtReturn != null ||
     // !m_aAtThrows.isEmpty () ||
@@ -163,14 +163,16 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
       // strings.
       // Output ensures that nonterminals are not split across separate
       // annotations. Each annotation must be a single grammatical unit.
-      for (final Map.Entry <String, List <String>> aEntry : m_Keywords.entrySet ())
+      for (final Map.Entry <String, List <JMLExpr>> aEntry : m_Keywords.entrySet ())
       {
         if (aEntry.getValue () != null)
         {
-          for (final String specStrings : aEntry.getValue ())
+          for (final JMLExpr specs : aEntry.getValue ())
           {
             f.print (sIndent).print (aEntry.getKey ());
-            f.print (" ").print (specStrings).newline ();
+            f.print (" ");
+            specs.generate (f); //emit the JMLExpression inside the spec corresponding to that spec keyword
+            f.newline ();
           }
         }
         else
