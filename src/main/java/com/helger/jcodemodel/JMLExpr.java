@@ -31,9 +31,9 @@ public class JMLExpr
    * @return Direct expression
    */
   @Nonnull
-  public static AbstractJExpressionImpl direct (@Nonnull final String source)
+  public static AbstractJMLExpressionImpl direct (@Nonnull final String source)
   {
-    return new AbstractJExpressionImpl ()
+    return new AbstractJMLExpressionImpl ()
     {
       public void generate (final JFormatter f)
       {
