@@ -4,9 +4,9 @@ import javax.annotation.Nonnull;
 
 public class JMLExpr
 {
-  IJExpression expression;
+  IJMLExpression expression;
 
-  JMLExpr (IJExpression expr)
+  JMLExpr (IJMLExpression expr)
   {
     this.expression = expr;
   }
