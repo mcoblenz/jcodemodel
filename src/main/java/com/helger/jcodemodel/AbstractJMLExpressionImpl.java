@@ -6,7 +6,9 @@ package com.helger.jcodemodel;
 import javax.annotation.Nonnull;
 
 /**
- * Provides default implementations for {@link IJMLExpression}.
+ * Provides default implementations for {@link IJMLExpression}. JML operators
+ * (e.g. implication, equivalence) only support JExpressions, which means that
+ * nesting JML operators is not supported.
  */
 public abstract class AbstractJMLExpressionImpl implements IJMLExpression
 {
@@ -70,7 +72,7 @@ public abstract class AbstractJMLExpressionImpl implements IJMLExpression
   // @Nonnull
   // public final JOpBinary plus (final double right)
   // {
-  // return null;
+  // return plus (JExpr.lit (right));
   // }
 
   // Real values are not supported.
@@ -135,7 +137,7 @@ public abstract class AbstractJMLExpressionImpl implements IJMLExpression
   {
     return JOp.mul (this, right);
   }
-  
+
   // Real values are not supported.
   // @Nonnull
   // public final JOpBinary mul (final double right)
