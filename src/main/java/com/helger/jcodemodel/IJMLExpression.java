@@ -23,6 +23,34 @@ public interface IJMLExpression extends IJExpression
 {
 
   /**
+   * Real valued literals are not supported. These signatures must be overridden, so that
+   * the default method implementations throw exceptions.
+   */
+  @Nonnull
+  IJExpression plus (double right);
+
+  @Nonnull
+  IJExpression plus (float right);
+
+  @Nonnull
+  IJExpression minus (double right);
+
+  @Nonnull
+  IJExpression minus (float right);
+  
+  @Nonnull
+  IJExpression mul (double right);
+
+  @Nonnull
+  IJExpression mul (float right);
+  
+  @Nonnull
+  IJExpression div (double right);
+
+  @Nonnull
+  IJExpression div (float right);
+
+  /**
    * Implication (p implies q; p ==> q) Equivalent to !p || q.
    * 
    * @param right
