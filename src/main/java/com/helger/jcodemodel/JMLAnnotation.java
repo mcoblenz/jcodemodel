@@ -138,7 +138,7 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
   }
 
   /**
-   * Used for adding an <code>@ensures</code> clause to the annotation block.
+   * Used for adding an <code>@ensures</code> clause to the annotation block, which are JML postconditions.
    * 
    * @param ensuresClause
    *        the JMLExpr which represents the postcondition clause.
@@ -148,6 +148,19 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
     final List <JMLExpr> p = new ArrayList <> ();
     p.add (ensuresClause);
     addKeyword ("ensures", p);
+  }
+  
+  /**
+   * Used for adding an <code>@requires</code> clause to the annotation block, which are JML preconditions.
+   * 
+   * @param  requiresClause
+   *        the JMLExpr which represents the postcondition clause.
+   */
+  public void addRequires (JMLExpr requiresClause)
+  {
+    final List <JMLExpr> p = new ArrayList <> ();
+    p.add (requiresClause);
+    addKeyword ("requires", p);
   }
 
   public void generate (@Nonnull final JFormatter f)
