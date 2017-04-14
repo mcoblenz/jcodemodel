@@ -121,17 +121,33 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
     return p;
   }
 
+  /**
+   * Remove all JML annotations corresponding to a particular keyword from the
+   * annotation block.
+   * 
+   * @param name
+   *        the token for the annotation to be removed
+   * @return Returns the map of annotation tokens to their lists of JMLExpr
+   *         clauses.
+   */
   @Nullable
   public Map <String, List <JMLExpr>> removeKeyword (@Nullable final JMLExpr name)
   {
     m_Keywords.remove (name);
     return m_Keywords;
   }
-  
-  public void addEnsures(JMLExpr ensuresClause){
-    final List<JMLExpr> p = new ArrayList<>();
+
+  /**
+   * Used for adding an <code>@ensures</code> clause to the annotation block.
+   * 
+   * @param ensuresClause
+   *        the JMLExpr which represents the postcondition clause.
+   */
+  public void addEnsures (JMLExpr ensuresClause)
+  {
+    final List <JMLExpr> p = new ArrayList <> ();
     p.add (ensuresClause);
-    addKeyword("ensures", p);
+    addKeyword ("ensures", p);
   }
 
   public void generate (@Nonnull final JFormatter f)
@@ -168,7 +184,8 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
           {
             f.print (sIndent).print (aEntry.getKey ());
             f.print (" ");
-            specs.generate (f); //emit the JMLExpression inside the spec corresponding to that spec keyword
+            specs.generate (f); // emit the JMLExpression inside the spec
+                                // corresponding to that spec keyword
             f.newline ();
           }
         }
