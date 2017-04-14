@@ -2,15 +2,20 @@ package com.helger.jcodemodel;
 
 import javax.annotation.Nonnull;
 
-public class JMLExpr extends AbstractJExpressionImpl
+public class JMLExpr
 {
+  IJExpression expression;
 
-  public void generate (JFormatter f)
+  JMLExpr (IJExpression expr)
   {
-    // TODO Auto-generated method stub
-
+    this.expression = expr;
   }
-  
+
+  void generate (JFormatter f)
+  {
+    this.expression.generate (f);
+  }
+
   /**
    * Creates a single JML expression directly from a code fragment.
    * <p>
