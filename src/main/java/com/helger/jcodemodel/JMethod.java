@@ -97,6 +97,11 @@ public class JMethod extends AbstractJGenerifiableImpl implements IJAnnotatable,
    * javadoc comments for this JMethod
    */
   private JDocComment m_aJDoc;
+  
+  /**
+   * javadoc comments for this JMethod
+   */
+  private JMLAnnotation m_aJML;
 
   /**
    * Variable parameter for this method's varargs declaration introduced in J2SE
@@ -529,6 +534,14 @@ public class JMethod extends AbstractJGenerifiableImpl implements IJAnnotatable,
     if (m_aJDoc == null)
       m_aJDoc = new JDocComment (owner ());
     return m_aJDoc;
+  }
+  
+  @Nonnull
+  public JMLAnnotation jml ()
+  {
+    if (m_aJML == null)
+      m_aJML = new JMLAnnotation (owner ());
+    return m_aJML;
   }
 
   @Override
