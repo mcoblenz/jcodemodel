@@ -62,7 +62,7 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
   private final JCodeModel m_aOwner;
 
   /** list of generic non-JML specification keywords */
-  private final Map <String, List <JMLExpr>> m_Keywords = new HashMap <> ();
+  private final Map <String, List <IJExpression>> m_Keywords = new HashMap <> ();
 
   protected JMLAnnotation (@Nonnull final JCodeModel owner)
   {
@@ -92,9 +92,9 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    * @return Map with the key/value pairs
    */
   @Nonnull
-  private List <JMLExpr> addKeyword (@Nonnull final String name)
+  private List <IJExpression> addKeyword (@Nonnull final String name)
   {
-    List <JMLExpr> p = m_Keywords.get (name);
+    List <IJExpression> p = m_Keywords.get (name);
     if (p == null)
     {
       p = new ArrayList <> ();
@@ -114,9 +114,9 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    *         specified just now.
    */
   @Nonnull
-  private List <JMLExpr> addKeyword (@Nonnull final String name, @Nonnull final List <JMLExpr> specs)
+  private List <IJExpression> addKeyword (@Nonnull final String name, @Nonnull final List <IJExpression> specs)
   {
-    final List <JMLExpr> p = addKeyword (name);
+    final List <IJExpression> p = addKeyword (name);
     p.addAll (specs);
     return p;
   }
@@ -131,7 +131,7 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    *         clauses.
    */
   @Nullable
-  public Map <String, List <JMLExpr>> removeKeyword (@Nullable final JMLExpr name)
+  public Map <String, List <IJExpression>> removeKeyword (@Nullable final IJExpression name)
   {
     m_Keywords.remove (name);
     return m_Keywords;
@@ -143,9 +143,9 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    * @param ensuresClause
    *        the JMLExpr which represents the postcondition clause.
    */
-  public void addEnsures (JMLExpr ensuresClause)
+  public void addEnsures (IJExpression ensuresClause)
   {
-    final List <JMLExpr> p = new ArrayList <> ();
+    final List <IJExpression> p = new ArrayList <> ();
     p.add (ensuresClause);
     addKeyword ("ensures", p);
   }
@@ -156,9 +156,9 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    * @param  requiresClause
    *        the JMLExpr which represents the postcondition clause.
    */
-  public void addRequires (JMLExpr requiresClause)
+  public void addRequires (IJExpression requiresClause)
   {
-    final List <JMLExpr> p = new ArrayList <> ();
+    final List <IJExpression> p = new ArrayList <> ();
     p.add (requiresClause);
     addKeyword ("requires", p);
   }
@@ -189,11 +189,11 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
       // strings.
       // Output ensures that nonterminals are not split across separate
       // annotations. Each annotation must be a single grammatical unit.
-      for (final Map.Entry <String, List <JMLExpr>> aEntry : m_Keywords.entrySet ())
+      for (final Map.Entry <String, List <IJExpression>> aEntry : m_Keywords.entrySet ())
       {
         if (aEntry.getValue () != null)
         {
-          for (final JMLExpr specs : aEntry.getValue ())
+          for (final IJExpression specs : aEntry.getValue ())
           {
             f.print (sIndent).print (aEntry.getKey ());
             f.print (" ");
