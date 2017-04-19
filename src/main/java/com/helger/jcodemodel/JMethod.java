@@ -99,7 +99,7 @@ public class JMethod extends AbstractJGenerifiableImpl implements IJAnnotatable,
   private JDocComment m_aJDoc;
   
   /**
-   * javadoc comments for this JMethod
+   * JML annotations for this JMethod
    */
   private JMLAnnotation m_aJML;
 
