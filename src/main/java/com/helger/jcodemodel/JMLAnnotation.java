@@ -55,24 +55,15 @@ import com.helger.jcodemodel.util.JCValueEnforcer;
  * begins with a keyword indicating the type of annotation. Supports non-JML
  * annotation keywords.
  */
-public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
+public class JMLAnnotation extends JCommentPart implements IJGenerable
 {
-  private static final long serialVersionUID = 2L;
-
-  private final JCodeModel m_aOwner;
+  private static final long serialVersionUID = 2L;;
 
   /** list of generic non-JML specification keywords */
   private final Map <String, List <IJMLExpression>> m_Keywords = new HashMap <> ();
 
-  protected JMLAnnotation (@Nonnull final JCodeModel owner)
+  public JMLAnnotation ()
   {
-    m_aOwner = JCValueEnforcer.notNull (owner, "Owner");
-  }
-
-  @Nonnull
-  public JCodeModel owner ()
-  {
-    return m_aOwner;
   }
 
   @Override
@@ -127,7 +118,7 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    * 
    * @param name
    *        the token for the annotation to be removed
-   * @return Returns the map of annotation tokens to their lists of JMLExpr
+   * @return Returns the map of annotation tokens to their lists of IJMLExpression
    *         clauses.
    */
   @Nullable
@@ -141,7 +132,7 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    * Used for adding an <code>@ensures</code> clause to the annotation block, which are JML postconditions.
    * 
    * @param ensuresClause
-   *        the JMLExpr which represents the postcondition clause.
+   *        the IJMLExpression which represents the postcondition clause.
    */
   public void addEnsures (IJMLExpression ensuresClause)
   {
@@ -154,7 +145,7 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
    * Used for adding an <code>@requires</code> clause to the annotation block, which are JML preconditions.
    * 
    * @param  requiresClause
-   *        the JMLExpr which represents the postcondition clause.
+   *        the IJMLExpression which represents the postcondition clause.
    */
   public void addRequires (IJMLExpression requiresClause)
   {
@@ -163,6 +154,16 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
     addKeyword ("requires", p);
   }
 
+  public void addAssume (IJMLExpression clause) {
+    final List <IJMLExpression> p = new ArrayList <> ();
+    p.add (clause);
+    addKeyword ("assume", p);
+  }
+  
+  public void addNullable () {
+    m_Keywords.put ("nullable", null);
+  }
+  
   public void generate (@Nonnull final JFormatter f)
   {
     // Is any keyword used?
@@ -174,11 +175,8 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
 
     if (!isEmpty () || bHasAnnotation)
     {
-      final String sIndent = " @ ";
+      final String sIndent = "//@ ";
       // final String sIndentLarge = sIndent + "\t";
-
-      // Start comment
-      f.print ("/*").newline ();
 
       // Print all simple text elements
       format (f, sIndent);
@@ -197,8 +195,9 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
           {
             f.print (sIndent).print (aEntry.getKey ());
             f.print (" ");
-            specs.generate (f); // emit the JMLExpression inside the spec
+            specs.generate (f); // emit the IJMLExpressionession inside the spec
                                 // corresponding to that spec keyword
+            f.print (';');
             f.newline ();
           }
         }
@@ -208,9 +207,6 @@ public class JMLAnnotation extends JCommentPart implements IJGenerable, IJOwned
           f.newline ();
         }
       }
-
-      // End comment
-      f.print ("@*/").newline ();
     }
   }
 }

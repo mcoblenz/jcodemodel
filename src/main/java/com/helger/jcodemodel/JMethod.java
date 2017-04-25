@@ -540,7 +540,7 @@ public class JMethod extends AbstractJGenerifiableImpl implements IJAnnotatable,
   public JMLAnnotation jml ()
   {
     if (m_aJML == null)
-      m_aJML = new JMLAnnotation (owner ());
+      m_aJML = new JMLAnnotation ();
     return m_aJML;
   }
 
@@ -554,6 +554,10 @@ public class JMethod extends AbstractJGenerifiableImpl implements IJAnnotatable,
       for (final JAnnotationUse a : m_aAnnotations)
         f.generable (a).newline ();
 
+    if (m_aJML != null) {
+      f.generable (m_aJML);
+    }
+    
     f.generable (m_aMods);
 
     // declare the generics parameters

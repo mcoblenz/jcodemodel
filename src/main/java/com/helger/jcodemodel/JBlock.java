@@ -537,6 +537,13 @@ public class JBlock implements IJGenerable, IJStatement
     return this;
   }
 
+  @Nonnull
+  public JBlock addJMLAnnotation (@Nonnull final JMLAnnotation a)
+  {
+    _insert (new JSpecificationStatement(a));
+    return this;
+  }
+  
   /**
    * Create an If statement and add it to this block
    *
